@@ -26,7 +26,7 @@ class OnboardingOptionCard extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
       decoration: BoxDecoration(
-        color: selected ? AppColors.primaryGreen.withOpacity(0.10) : AppColors.surface,
+        color: selected ? AppColors.primaryGreen.withAlpha(26) : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
         border: Border.all(
           color: selected ? AppColors.primaryGreen : AppColors.border,

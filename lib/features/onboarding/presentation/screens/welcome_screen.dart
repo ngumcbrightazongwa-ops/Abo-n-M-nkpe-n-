@@ -55,7 +55,7 @@ class WelcomeScreen extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primaryGreen.withOpacity(0.10),
+                            color: AppColors.primaryGreen.withAlpha(26),
                           ),
                           padding: const EdgeInsets.all(10),
                           child: ClipOval(

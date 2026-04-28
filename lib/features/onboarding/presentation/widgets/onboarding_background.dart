@@ -25,7 +25,7 @@ class _DiamondPatternPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
-    final color = AppColors.border.withOpacity(0.35);
+    final color = AppColors.border.withAlpha(89);
     paint.color = color;
 
     const spacing = 78.0;
