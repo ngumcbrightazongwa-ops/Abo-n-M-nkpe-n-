@@ -29,22 +29,9 @@ class WelcomeScreen extends StatelessWidget {
                   children: [
                     const AdaptiveAssetImage(
                       basePath: 'assets/images/nkwen_logo',
-                      height: 154,
+                      height: 230,
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Nkwen',
-                      style: AppTextStyles.headline.copyWith(
-                        fontSize: 30,
-                        color: AppColors.primaryGreen,
-                      ),
-                    ),
-                    Text(
-                      'Language App',
-                      style: AppTextStyles.bodyMuted.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    const SizedBox(height: 12),
                   ],
                 ),
                 const SizedBox(height: 16),
