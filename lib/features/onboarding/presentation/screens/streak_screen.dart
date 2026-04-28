@@ -7,34 +7,42 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/primary_button.dart';
 import '../widgets/onboarding_character.dart';
 
-class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
+class StreakScreen extends StatelessWidget {
+  const StreakScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSizes.pagePadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 8),
+              const Center(
+                child: OnboardingCharacter(
+                  state: OnboardingCharacterState.happy,
+                  height: 200,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text('Day 1 streak', style: AppTextStyles.headline),
+              const SizedBox(height: 6),
+              Text('Come back tomorrow to keep it going.', style: AppTextStyles.bodyMuted),
+              const SizedBox(height: 16),
               AppCard(
                 child: Row(
                   children: [
-                    const OnboardingCharacter(state: OnboardingCharacterState.happy, height: 86),
+                    const Icon(Icons.local_fire_department, color: Colors.orange),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Njwelà!', style: AppTextStyles.headline),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Welcome to Nkwen. Let’s start your story.',
-                            style: AppTextStyles.bodyMuted,
-                          ),
+                          Text('Streak: 1 day', style: AppTextStyles.title),
+                          const SizedBox(height: 4),
+                          Text('You’re on track.', style: AppTextStyles.bodyMuted),
                         ],
                       ),
                     ),
@@ -43,8 +51,8 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const Spacer(),
               PrimaryButton(
-                label: 'Get Started',
-                onPressed: () => context.go('/onboarding/name'),
+                label: 'Continue',
+                onPressed: () => context.go('/onboarding/commitment'),
               ),
             ],
           ),
@@ -53,3 +61,4 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 }
+
