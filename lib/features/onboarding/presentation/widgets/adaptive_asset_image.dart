@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AdaptiveAssetImage extends StatelessWidget {
-  static Future<Set<String>>? _manifestKeysFuture;
+  static Future<Map<String, String>>? _manifestKeysFuture;
 
   final String basePath;
   final double? width;
@@ -22,10 +22,12 @@ class AdaptiveAssetImage extends StatelessWidget {
     this.placeholder,
   });
 
-  static Future<Set<String>> _loadManifestKeys() async {
+  static Future<Map<String, String>> _loadManifestKeys() async {
     final jsonStr = await rootBundle.loadString('AssetManifest.json');
     final map = json.decode(jsonStr) as Map<String, dynamic>;
-    return map.keys.toSet();
+    return {
+      for (final key in map.keys) key.toLowerCase(): key,
+    };
   }
 
   static bool _hasKnownExtension(String path) {
@@ -34,15 +36,18 @@ class AdaptiveAssetImage extends StatelessWidget {
   }
 
   static Future<String> _resolvePath(String basePath) async {
-    if (_hasKnownExtension(basePath)) return basePath;
-
     _manifestKeysFuture ??= _loadManifestKeys();
     final keys = await _manifestKeysFuture!;
+
+    if (_hasKnownExtension(basePath)) {
+      return keys[basePath.toLowerCase()] ?? basePath;
+    }
 
     const exts = ['svg', 'png', 'jpg', 'jpeg', 'webp', 'gif'];
     for (final ext in exts) {
       final candidate = '$basePath.$ext';
-      if (keys.contains(candidate)) return candidate;
+      final resolved = keys[candidate.toLowerCase()];
+      if (resolved != null) return resolved;
     }
     return basePath;
   }
@@ -86,4 +91,3 @@ class AdaptiveAssetImage extends StatelessWidget {
     );
   }
 }
-
