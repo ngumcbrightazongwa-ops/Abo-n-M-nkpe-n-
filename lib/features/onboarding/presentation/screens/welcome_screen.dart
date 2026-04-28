@@ -29,7 +29,7 @@ class WelcomeScreen extends StatelessWidget {
                   children: [
                     const AdaptiveAssetImage(
                       basePath: 'assets/images/nkwen_logo',
-                      height: 48,
+                      height: 154,
                     ),
                     const SizedBox(height: 8),
                     Text(

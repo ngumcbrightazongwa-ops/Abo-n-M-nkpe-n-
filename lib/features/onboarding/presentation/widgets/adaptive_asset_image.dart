@@ -5,12 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AdaptiveAssetImage extends StatelessWidget {
-<<<<<<< HEAD
   static Future<Set<String>>? _manifestKeysFuture;
   static final Map<String, Future<String>> _resolvedPathCache = {};
-=======
-  static Future<Map<String, String>>? _manifestKeysFuture;
->>>>>>> a479fdf658ffc34393a15ad33cc12cbaf243d0e4
 
   final String basePath;
   final double? width;
@@ -27,7 +23,6 @@ class AdaptiveAssetImage extends StatelessWidget {
     this.placeholder,
   });
 
-<<<<<<< HEAD
   static Future<Set<String>> _loadManifestKeys() async {
     try {
       final jsonStr = await rootBundle.loadString('AssetManifest.bin.json');
@@ -42,14 +37,6 @@ class AdaptiveAssetImage extends StatelessWidget {
         return <String>{};
       }
     }
-=======
-  static Future<Map<String, String>> _loadManifestKeys() async {
-    final jsonStr = await rootBundle.loadString('AssetManifest.json');
-    final map = json.decode(jsonStr) as Map<String, dynamic>;
-    return {
-      for (final key in map.keys) key.toLowerCase(): key,
-    };
->>>>>>> a479fdf658ffc34393a15ad33cc12cbaf243d0e4
   }
 
   static bool _hasKnownExtension(String path) {
@@ -64,11 +51,16 @@ class AdaptiveAssetImage extends StatelessWidget {
 
   static String _sanitizeSvg(String svg) {
     var s = svg;
+    s = s.replaceFirst(RegExp(r'<\?xml[^>]*\?>'), '');
     s = s.replaceFirst(RegExp(r'<!DOCTYPE[^>]*>'), '');
     s = s.replaceAll(RegExp(r'\swidth="[^"]*%"'), '');
     s = s.replaceAll(RegExp(r"\swidth='[^']*%'"), '');
     s = s.replaceAll(RegExp(r'\sheight="[^"]*%"'), '');
     s = s.replaceAll(RegExp(r"\sheight='[^']*%'"), '');
+    s = s.replaceAll(
+      RegExp(r'<text\b[\s\S]*?<\/text>', dotAll: true, caseSensitive: false),
+      '',
+    );
     s = s.replaceAllMapped(
       RegExp(r'(-?\d+(?:\.\d+)?)px'),
       (m) => m.group(1) ?? '',
@@ -77,7 +69,6 @@ class AdaptiveAssetImage extends StatelessWidget {
   }
 
   static Future<String> _resolvePath(String basePath) async {
-<<<<<<< HEAD
     if (_hasKnownExtension(basePath)) return basePath;
     return _resolvedPathCache.putIfAbsent(basePath, () async {
       _manifestKeysFuture ??= _loadManifestKeys();
@@ -102,22 +93,6 @@ class AdaptiveAssetImage extends StatelessWidget {
 
       return basePath;
     });
-=======
-    _manifestKeysFuture ??= _loadManifestKeys();
-    final keys = await _manifestKeysFuture!;
-
-    if (_hasKnownExtension(basePath)) {
-      return keys[basePath.toLowerCase()] ?? basePath;
-    }
-
-    const exts = ['svg', 'png', 'jpg', 'jpeg', 'webp', 'gif'];
-    for (final ext in exts) {
-      final candidate = '$basePath.$ext';
-      final resolved = keys[candidate.toLowerCase()];
-      if (resolved != null) return resolved;
-    }
-    return basePath;
->>>>>>> a479fdf658ffc34393a15ad33cc12cbaf243d0e4
   }
 
   @override
@@ -129,6 +104,8 @@ class AdaptiveAssetImage extends StatelessWidget {
 
         final path = snapshot.data!;
         final isSvg = path.toLowerCase().endsWith('.svg');
+        final effectiveWidth = width ?? height;
+        final effectiveHeight = height ?? width;
 
         if (isSvg) {
           return FutureBuilder<String>(
@@ -140,14 +117,25 @@ class AdaptiveAssetImage extends StatelessWidget {
 
               return SvgPicture.string(
                 svgSnapshot.data!,
-                width: width,
-                height: height,
+                width: effectiveWidth,
+                height: effectiveHeight,
                 fit: fit,
                 placeholderBuilder:
                     (context) => placeholder ?? _defaultPlaceholder(),
-                errorBuilder:
-                    (context, error, stackTrace) =>
-                        placeholder ?? _defaultPlaceholder(),
+                errorBuilder: (context, error, stackTrace) {
+                  assert(() {
+                    FlutterError.reportError(
+                      FlutterErrorDetails(
+                        exception: error,
+                        stack: stackTrace,
+                        library: 'AdaptiveAssetImage',
+                        context: ErrorDescription('while decoding $path'),
+                      ),
+                    );
+                    return true;
+                  }());
+                  return placeholder ?? _defaultPlaceholder();
+                },
               );
             },
           );
@@ -155,8 +143,8 @@ class AdaptiveAssetImage extends StatelessWidget {
 
         return Image.asset(
           path,
-          width: width,
-          height: height,
+          width: effectiveWidth,
+          height: effectiveHeight,
           fit: fit,
           errorBuilder:
               (context, error, stackTrace) =>

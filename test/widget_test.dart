@@ -11,7 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nkwen_language_app/app/app.dart';
 
 void main() {
-  testWidgets('App shows welcome screen after splash', (WidgetTester tester) async {
+  testWidgets('App shows welcome screen after splash', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const ProviderScope(child: App()));
     await tester.pump(const Duration(milliseconds: 950));
     await tester.pumpAndSettle();
