@@ -20,4 +20,18 @@ void main() {
 
     expect(find.text('Get Started'), findsOneWidget);
   });
+
+  testWidgets('Get Started navigates to name input screen', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: App()));
+    await tester.pump(const Duration(milliseconds: 950));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Get Started'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Let’s make this personal.'), findsOneWidget);
+    expect(find.text('Continue'), findsOneWidget);
+  });
 }

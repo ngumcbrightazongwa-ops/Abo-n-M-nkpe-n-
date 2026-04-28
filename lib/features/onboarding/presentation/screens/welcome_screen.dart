@@ -166,7 +166,7 @@ class _WelcomeTitle extends StatelessWidget {
           ),
         ),
         Positioned(
-          left: -26,
+          left: -30,
           child: _Marks(
             colors: const [
               Color(0xFFF59E0B),
@@ -176,7 +176,7 @@ class _WelcomeTitle extends StatelessWidget {
           ),
         ),
         Positioned(
-          right: -26,
+          right: -30,
           child: Transform.flip(
             flipX: true,
             child: _Marks(
@@ -204,9 +204,9 @@ class _Marks extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _Mark(color: colors[0], rotation: -0.6),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         _Mark(color: colors[1], rotation: -0.1),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         _Mark(color: colors[2], rotation: 0.4),
       ],
     );
@@ -224,11 +224,11 @@ class _Mark extends StatelessWidget {
     return Transform.rotate(
       angle: rotation,
       child: Container(
-        width: 16,
-        height: 4,
+        width: 20,
+        height: 5,
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(999),
         ),
       ),
     );
