@@ -61,7 +61,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/onboarding',
-        redirect: (context, state) => '/onboarding/welcome',
+        redirect: (context, state) {
+          return state.uri.path == '/onboarding' ? '/onboarding/welcome' : null;
+        },
         routes: [
           GoRoute(
             path: 'welcome',
