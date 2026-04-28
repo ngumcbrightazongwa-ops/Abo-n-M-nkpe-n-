@@ -1,6 +1,5 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/constants/app_sizes.dart';
@@ -16,102 +15,135 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: OnboardingBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSizes.pagePadding),
-            child: Column(
-              children: [
-                const SizedBox(height: 8),
-                Column(
-                  children: [
-                    const AdaptiveAssetImage(
-                      basePath: 'assets/images/nkwen_logo',
-                      height: 230,
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              LayoutBuilder(
-                                builder: (context, constraints) {
-                                  final maxByHeight =
-                                      constraints.maxHeight.isFinite
-                                          ? constraints.maxHeight * 0.55
-                                          : 240.0;
-                                  final diameter = math
-                                      .min(constraints.maxWidth, maxByHeight)
-                                      .clamp(140.0, 360.0);
+    final topInset = MediaQuery.paddingOf(context).top;
 
-                                  return SizedBox.square(
-                                    dimension: diameter,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: AppColors.primaryGreen.withAlpha(
-                                          26,
-                                        ),
-                                      ),
-                                      padding: const EdgeInsets.all(10),
-                                      child: ClipOval(
-                                        child: const AdaptiveAssetImage(
-                                          basePath:
-                                              'assets/characters/welcome_family',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 22),
-                              _WelcomeTitle(),
-                              const SizedBox(height: 10),
-                              Text(
-                                'Welcome to Nkwen learning.',
-                                style: AppTextStyles.title.copyWith(
-                                  fontWeight: FontWeight.w800,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: AppColors.surface,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        backgroundColor: AppColors.surface,
+        body: Stack(
+          children: [
+            OnboardingBackground(
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSizes.pagePadding),
+                  child: Column(
+                    children: [
+                      const _WelcomeHeader(),
+                      Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            return SingleChildScrollView(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight,
                                 ),
-                                textAlign: TextAlign.center,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(height: 18),
+                                    _WelcomeTitle(),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      'Welcome to Nkwen learning.',
+                                      style: AppTextStyles.title.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Let’s learn. Let’s speak. Let’s connect.',
+                                      style: AppTextStyles.bodyMuted,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Let’s learn. Let’s speak. Let’s connect.',
-                                style: AppTextStyles.bodyMuted,
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
-                      );
-                    },
+                      ),
+                      const SizedBox(height: 10),
+                      const OnboardingPageIndicator(count: 3, index: 0),
+                      const SizedBox(height: 18),
+                      OnboardingPrimaryButton(
+                        label: 'Get Started',
+                        onPressed: () => context.go('/onboarding/name'),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 10),
-                const OnboardingPageIndicator(count: 3, index: 0),
-                const SizedBox(height: 18),
-                OnboardingPrimaryButton(
-                  label: 'Get Started',
-                  onPressed: () => context.go('/onboarding/name'),
+              ),
+            ),
+            if (topInset > 0)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: topInset,
+                child: const ColoredBox(color: AppColors.surface),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WelcomeHeader extends StatelessWidget {
+  const _WelcomeHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.sizeOf(context);
+    final headerHeight = (screenSize.height * 0.52).clamp(300.0, 460.0);
+
+    return SizedBox(
+      height: headerHeight,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          const Positioned.fill(child: ColoredBox(color: AppColors.surface)),
+          Positioned.fill(
+            child: OverflowBox(
+              alignment: Alignment.topCenter,
+              maxWidth: double.infinity,
+              child: SizedBox(
+                width: screenSize.width,
+                child: ClipPath(
+                  clipper: _BottomArcClipper(),
+                  child: Transform.translate(
+                    offset: const Offset(0, 18),
+                    child: const AdaptiveAssetImage(
+                      basePath: 'assets/characters/welcome_family',
+                      fit: BoxFit.cover,
+                      alignment: Alignment.topCenter,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const AdaptiveAssetImage(
+                  basePath: 'assets/images/nkwen_logo',
+                  height: 148,
                 ),
                 const SizedBox(height: 10),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -201,4 +233,25 @@ class _Mark extends StatelessWidget {
       ),
     );
   }
+}
+
+class _BottomArcClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final arcHeight = size.height * 0.22;
+    return Path()
+      ..moveTo(0, 0)
+      ..lineTo(0, size.height - arcHeight)
+      ..quadraticBezierTo(
+        size.width / 2,
+        size.height + arcHeight,
+        size.width,
+        size.height - arcHeight,
+      )
+      ..lineTo(size.width, 0)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

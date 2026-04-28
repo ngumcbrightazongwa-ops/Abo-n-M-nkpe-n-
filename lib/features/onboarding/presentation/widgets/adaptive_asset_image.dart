@@ -12,6 +12,7 @@ class AdaptiveAssetImage extends StatelessWidget {
   final double? width;
   final double? height;
   final BoxFit fit;
+  final AlignmentGeometry alignment;
   final Widget? placeholder;
 
   const AdaptiveAssetImage({
@@ -20,6 +21,7 @@ class AdaptiveAssetImage extends StatelessWidget {
     this.width,
     this.height,
     this.fit = BoxFit.contain,
+    this.alignment = Alignment.center,
     this.placeholder,
   });
 
@@ -120,6 +122,7 @@ class AdaptiveAssetImage extends StatelessWidget {
                 width: effectiveWidth,
                 height: effectiveHeight,
                 fit: fit,
+                alignment: alignment,
                 placeholderBuilder:
                     (context) => placeholder ?? _defaultPlaceholder(),
                 errorBuilder: (context, error, stackTrace) {
@@ -146,6 +149,7 @@ class AdaptiveAssetImage extends StatelessWidget {
           width: effectiveWidth,
           height: effectiveHeight,
           fit: fit,
+          alignment: alignment,
           errorBuilder:
               (context, error, stackTrace) =>
                   placeholder ?? _defaultPlaceholder(),
