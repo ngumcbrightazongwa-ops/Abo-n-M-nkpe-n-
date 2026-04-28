@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -47,42 +49,68 @@ class WelcomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AspectRatio(
-                        aspectRatio: 1,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.primaryGreen.withAlpha(26),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
                           ),
-                          padding: const EdgeInsets.all(10),
-                          child: ClipOval(
-                            child: const AdaptiveAssetImage(
-                              basePath: 'assets/characters/welcome_family',
-                              fit: BoxFit.cover,
-                            ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final maxByHeight =
+                                      constraints.maxHeight.isFinite
+                                          ? constraints.maxHeight * 0.55
+                                          : 240.0;
+                                  final diameter = math
+                                      .min(constraints.maxWidth, maxByHeight)
+                                      .clamp(140.0, 360.0);
+
+                                  return SizedBox.square(
+                                    dimension: diameter,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppColors.primaryGreen.withAlpha(
+                                          26,
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.all(10),
+                                      child: ClipOval(
+                                        child: const AdaptiveAssetImage(
+                                          basePath:
+                                              'assets/characters/welcome_family',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 22),
+                              _WelcomeTitle(),
+                              const SizedBox(height: 10),
+                              Text(
+                                'Welcome to Nkwen learning.',
+                                style: AppTextStyles.title.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Let’s learn. Let’s speak. Let’s connect.',
+                                style: AppTextStyles.bodyMuted,
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 22),
-                      _WelcomeTitle(),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Welcome to Nkwen learning.',
-                        style: AppTextStyles.title.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Let’s learn. Let’s speak. Let’s connect.',
-                        style: AppTextStyles.bodyMuted,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 10),

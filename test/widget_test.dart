@@ -16,6 +16,6 @@ void main() {
     await tester.pump(const Duration(milliseconds: 950));
     await tester.pumpAndSettle();
 
-    expect(find.text('Learn Nkwen'), findsOneWidget);
+    expect(find.text('Get Started'), findsOneWidget);
   });
 }
