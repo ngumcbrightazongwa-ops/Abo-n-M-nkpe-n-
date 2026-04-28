@@ -41,7 +41,9 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     Text(
                       'Language App',
-                      style: AppTextStyles.bodyMuted.copyWith(fontWeight: FontWeight.w700),
+                      style: AppTextStyles.bodyMuted.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),
@@ -65,7 +67,9 @@ class WelcomeScreen extends StatelessWidget {
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
                                   color: AppColors.surface,
-                                  child: const Center(child: Icon(Icons.image_outlined, size: 64)),
+                                  child: const Center(
+                                    child: Icon(Icons.image_outlined, size: 64),
+                                  ),
                                 );
                               },
                             ),
@@ -77,7 +81,9 @@ class WelcomeScreen extends StatelessWidget {
                       const SizedBox(height: 10),
                       Text(
                         'Welcome to Nkwen learning.',
-                        style: AppTextStyles.title.copyWith(fontWeight: FontWeight.w800),
+                        style: AppTextStyles.title.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
@@ -125,7 +131,11 @@ class _WelcomeTitle extends StatelessWidget {
         Positioned(
           left: -26,
           child: _Marks(
-            colors: const [Color(0xFFF59E0B), Color(0xFFEF4444), Color(0xFF22C55E)],
+            colors: const [
+              Color(0xFFF59E0B),
+              Color(0xFFEF4444),
+              Color(0xFF22C55E),
+            ],
           ),
         ),
         Positioned(
@@ -133,7 +143,11 @@ class _WelcomeTitle extends StatelessWidget {
           child: Transform.flip(
             flipX: true,
             child: _Marks(
-              colors: const [Color(0xFFF59E0B), Color(0xFFEF4444), Color(0xFF22C55E)],
+              colors: const [
+                Color(0xFFF59E0B),
+                Color(0xFFEF4444),
+                Color(0xFF22C55E),
+              ],
             ),
           ),
         ),
