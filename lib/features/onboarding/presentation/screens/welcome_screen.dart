@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/constants/app_sizes.dart';
+import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
-import '../../../../shared/widgets/app_card.dart';
-import '../../../../shared/widgets/primary_button.dart';
-import '../widgets/onboarding_character.dart';
+import '../widgets/onboarding_background.dart';
+import '../widgets/onboarding_page_indicator.dart';
+import '../widgets/onboarding_primary_button.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -13,41 +14,170 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSizes.pagePadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 8),
-              AppCard(
-                child: Row(
+      backgroundColor: AppColors.background,
+      body: OnboardingBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSizes.pagePadding),
+            child: Column(
+              children: [
+                const SizedBox(height: 8),
+                Column(
                   children: [
-                    const OnboardingCharacter(state: OnboardingCharacterState.happy, height: 86),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Njwelà!', style: AppTextStyles.headline),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Welcome to Nkwen. Let’s start your story.',
-                            style: AppTextStyles.bodyMuted,
-                          ),
-                        ],
+                    Image.asset(
+                      'assets/images/nkwen_logo.png',
+                      height: 48,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const SizedBox(height: 48);
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Nkwen',
+                      style: AppTextStyles.headline.copyWith(
+                        fontSize: 30,
+                        color: AppColors.primaryGreen,
                       ),
+                    ),
+                    Text(
+                      'Language App',
+                      style: AppTextStyles.bodyMuted.copyWith(fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
-              ),
-              const Spacer(),
-              PrimaryButton(
-                label: 'Get Started',
-                onPressed: () => context.go('/onboarding/name'),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 1,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primaryGreen.withOpacity(0.10),
+                          ),
+                          padding: const EdgeInsets.all(10),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/characters/welcome_family.png',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: AppColors.surface,
+                                  child: const Center(child: Icon(Icons.image_outlined, size: 64)),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      _WelcomeTitle(),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Welcome to Nkwen learning.',
+                        style: AppTextStyles.title.copyWith(fontWeight: FontWeight.w800),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Let’s learn. Let’s speak. Let’s connect.',
+                        style: AppTextStyles.bodyMuted,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const OnboardingPageIndicator(count: 3, index: 0),
+                const SizedBox(height: 18),
+                OnboardingPrimaryButton(
+                  label: 'Get Started',
+                  onPressed: () => context.go('/onboarding/name'),
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WelcomeTitle extends StatelessWidget {
+  const _WelcomeTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
+      children: [
+        Text(
+          'Njwelà!',
+          style: AppTextStyles.headline.copyWith(
+            fontSize: 42,
+            color: AppColors.primaryGreen,
+          ),
+        ),
+        Positioned(
+          left: -26,
+          child: _Marks(
+            colors: const [Color(0xFFF59E0B), Color(0xFFEF4444), Color(0xFF22C55E)],
+          ),
+        ),
+        Positioned(
+          right: -26,
+          child: Transform.flip(
+            flipX: true,
+            child: _Marks(
+              colors: const [Color(0xFFF59E0B), Color(0xFFEF4444), Color(0xFF22C55E)],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Marks extends StatelessWidget {
+  final List<Color> colors;
+
+  const _Marks({required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _Mark(color: colors[0], rotation: -0.6),
+        const SizedBox(height: 6),
+        _Mark(color: colors[1], rotation: -0.1),
+        const SizedBox(height: 6),
+        _Mark(color: colors[2], rotation: 0.4),
+      ],
+    );
+  }
+}
+
+class _Mark extends StatelessWidget {
+  final Color color;
+  final double rotation;
+
+  const _Mark({required this.color, required this.rotation});
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: rotation,
+      child: Container(
+        width: 16,
+        height: 4,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
     );
