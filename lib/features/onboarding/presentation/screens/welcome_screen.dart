@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/constants/app_sizes.dart';
@@ -24,11 +25,17 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Column(
                   children: [
-                    Image.asset(
-                      'assets/images/nkwen_logo.png',
+                    SvgPicture.asset(
+                      'assets/images/nkwen_logo.svg',
                       height: 48,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox(height: 48);
+                      placeholderBuilder: (context) {
+                        return Image.asset(
+                          'assets/images/nkwen_logo.png',
+                          height: 48,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const SizedBox(height: 48);
+                          },
+                        );
                       },
                     ),
                     const SizedBox(height: 8),
@@ -61,15 +68,21 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                           padding: const EdgeInsets.all(10),
                           child: ClipOval(
-                            child: Image.asset(
-                              'assets/characters/welcome_family.png',
+                            child: SvgPicture.asset(
+                              'assets/characters/welcome_family.svg',
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: AppColors.surface,
-                                  child: const Center(
-                                    child: Icon(Icons.image_outlined, size: 64),
-                                  ),
+                              placeholderBuilder: (context) {
+                                return Image.asset(
+                                  'assets/characters/welcome_family.png',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: AppColors.surface,
+                                      child: const Center(
+                                        child: Icon(Icons.image_outlined, size: 64),
+                                      ),
+                                    );
+                                  },
                                 );
                               },
                             ),
