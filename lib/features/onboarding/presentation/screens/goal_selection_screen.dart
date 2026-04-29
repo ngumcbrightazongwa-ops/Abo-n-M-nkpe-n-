@@ -197,15 +197,34 @@ class _StepIndicator extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         for (var i = 0; i < count; i++) ...[
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 26,
-            height: 6,
-            decoration: BoxDecoration(
-              color: i <= index ? AppColors.primaryGreen : AppColors.border,
-              borderRadius: BorderRadius.circular(999),
+          if (i == index)
+            Container(
+              width: 24,
+              height: 24,
+              decoration: const BoxDecoration(
+                color: AppColors.primaryGreen,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  '${i + 1}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            )
+          else
+            Container(
+              width: 26,
+              height: 6,
+              decoration: BoxDecoration(
+                color: i < index ? AppColors.primaryGreen : AppColors.border,
+                borderRadius: BorderRadius.circular(999),
+              ),
             ),
-          ),
           if (i != count - 1) const SizedBox(width: 8),
         ],
       ],

@@ -26,7 +26,11 @@ class AhaMomentScreen extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [AppColors.surface, AppColors.surface, Color(0x00FFFFFF)],
+                  colors: [
+                    AppColors.surface,
+                    AppColors.surface,
+                    Color(0x00FFFFFF),
+                  ],
                   stops: [0, 0.55, 1],
                 ),
               ),
@@ -66,42 +70,63 @@ class AhaMomentScreen extends StatelessWidget {
                       const SizedBox(width: 44, height: 44),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  Transform.translate(
-                    offset: const Offset(0, -10),
-                    child: SizedBox(
-                      height: (MediaQuery.sizeOf(context).height * 0.36).clamp(
-                        240.0,
-                        360.0,
-                      ),
-                      child: const AdaptiveAssetImage(
-                        basePath: 'assets/characters/child_thinking',
-                        fit: BoxFit.contain,
-                        alignment: Alignment.bottomCenter,
-                      ),
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Transform.translate(
+                                offset: const Offset(0, -26),
+                                child: SizedBox(
+                                  height: (constraints.maxHeight * 0.34).clamp(
+                                    160.0,
+                                    250.0,
+                                  ),
+                                  child: const AdaptiveAssetImage(
+                                    basePath:
+                                        'assets/characters/child_thinking',
+                                    fit: BoxFit.contain,
+                                    alignment: Alignment.bottomCenter,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              const _AhaTitle(),
+                              const SizedBox(height: 10),
+                              Text(
+                                'Don’t worry. Let’s fix that together.',
+                                style: AppTextStyles.bodyMuted.copyWith(
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 12),
+                              _AudioCard(
+                                onPressed:
+                                    () => context.showSnack(
+                                      'Sample audio will be added soon.',
+                                    ),
+                              ),
+                              const SizedBox(height: 12),
+                              const Icon(
+                                Icons.favorite_border,
+                                color: AppColors.primaryGreen,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Even if you missed it,\nwe’ll teach you step by step.',
+                                style: AppTextStyles.bodyMuted.copyWith(
+                                  fontSize: 15,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  const _AhaTitle(),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Don’t worry. Let’s fix that together.',
-                    style: AppTextStyles.bodyMuted.copyWith(fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 18),
-                  _AudioCard(
-                    onPressed: () => context.showSnack('Sample audio will be added soon.'),
-                  ),
-                  const SizedBox(height: 22),
-                  const Icon(Icons.favorite_border, color: AppColors.primaryGreen),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Even if you missed it,\nwe’ll teach you step by step.',
-                    style: AppTextStyles.bodyMuted.copyWith(fontSize: 15),
-                    textAlign: TextAlign.center,
-                  ),
-                  const Spacer(),
                   OnboardingPrimaryButton(
                     label: 'Continue',
                     onPressed: () => context.push('/onboarding/lesson'),
@@ -305,7 +330,10 @@ class _AudioCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: AppColors.primaryGreen.withAlpha(18),
                 ),
-                child: const Icon(Icons.volume_up, color: AppColors.primaryGreen),
+                child: const Icon(
+                  Icons.volume_up,
+                  color: AppColors.primaryGreen,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
