@@ -76,18 +76,20 @@ class AhaMomentScreen extends StatelessWidget {
                         return SingleChildScrollView(
                           child: Column(
                             children: [
-                              Transform.translate(
-                                offset: const Offset(0, -26),
-                                child: SizedBox(
-                                  height: (constraints.maxHeight * 0.34).clamp(
-                                    160.0,
-                                    250.0,
-                                  ),
-                                  child: const AdaptiveAssetImage(
-                                    basePath:
-                                        'assets/characters/child_thinking',
-                                    fit: BoxFit.contain,
-                                    alignment: Alignment.bottomCenter,
+                              SizedBox(
+                                height: (constraints.maxHeight * 0.34).clamp(
+                                  160.0,
+                                  250.0,
+                                ),
+                                child: ClipRect(
+                                  child: Transform.translate(
+                                    offset: const Offset(0, -26),
+                                    child: const AdaptiveAssetImage(
+                                      basePath:
+                                          'assets/characters/child_thinking',
+                                      fit: BoxFit.contain,
+                                      alignment: Alignment.bottomCenter,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -152,6 +154,7 @@ class _StepIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         for (var i = 0; i < count; i++) ...[
           if (i == index)
@@ -174,12 +177,19 @@ class _StepIndicator extends StatelessWidget {
               ),
             )
           else
-            Container(
-              width: 26,
-              height: 6,
-              decoration: BoxDecoration(
-                color: i < index ? AppColors.primaryGreen : AppColors.border,
-                borderRadius: BorderRadius.circular(999),
+            SizedBox(
+              height: 24,
+              child: Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: 26,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color:
+                        i < index ? AppColors.primaryGreen : AppColors.border,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
               ),
             ),
           if (i != count - 1) const SizedBox(width: 8),

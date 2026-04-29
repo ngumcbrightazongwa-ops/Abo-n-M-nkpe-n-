@@ -191,6 +191,7 @@ class _StepIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         for (var i = 0; i < count; i++) ...[
           if (i == index)
@@ -213,12 +214,18 @@ class _StepIndicator extends StatelessWidget {
               ),
             )
           else
-            Container(
-              width: 26,
-              height: 6,
-              decoration: BoxDecoration(
-                color: i < index ? AppColors.primaryGreen : AppColors.border,
-                borderRadius: BorderRadius.circular(999),
+            SizedBox(
+              height: 24,
+              child: Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: 26,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: i < index ? AppColors.primaryGreen : AppColors.border,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
               ),
             ),
           if (i != count - 1) const SizedBox(width: 8),
