@@ -1,5 +1,11 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:math' as math;
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../../../../app/constants/app_sizes.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -10,8 +16,103 @@ import '../widgets/adaptive_asset_image.dart';
 import '../widgets/onboarding_background.dart';
 import '../widgets/onboarding_primary_button.dart';
 
-class AhaMomentScreen extends StatelessWidget {
+class AhaMomentScreen extends StatefulWidget {
   const AhaMomentScreen({super.key});
+
+  @override
+  State<AhaMomentScreen> createState() => _AhaMomentScreenState();
+}
+
+class _AhaMomentScreenState extends State<AhaMomentScreen>
+    with SingleTickerProviderStateMixin {
+  late final AudioPlayer _player;
+  late final AnimationController _waveController;
+  late final StreamSubscription<PlayerState> _playerSub;
+  String? _samplePath;
+  bool _loadingSample = false;
+  bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _player = AudioPlayer();
+    _waveController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+    _playerSub = _player.playerStateStream.listen(_onPlayerState);
+    _prepareSample();
+  }
+
+  @override
+  void dispose() {
+    _playerSub.cancel();
+    _waveController.dispose();
+    _player.dispose();
+    super.dispose();
+  }
+
+  void _onPlayerState(PlayerState state) {
+    final playing =
+        state.playing && state.processingState != ProcessingState.completed;
+
+    if (playing != _isPlaying) {
+      setState(() => _isPlaying = playing);
+    }
+
+    if (playing) {
+      if (!_waveController.isAnimating) {
+        _waveController.repeat();
+      }
+      return;
+    }
+
+    if (_waveController.isAnimating) {
+      _waveController.stop();
+    }
+    if (_waveController.value != 0) {
+      _waveController.value = 0;
+    }
+  }
+
+  Future<void> _prepareSample() async {
+    if (_loadingSample) return;
+    setState(() => _loadingSample = true);
+    try {
+      final file = File(
+        '${Directory.systemTemp.path}${Platform.pathSeparator}nkwen_sample_${DateTime.now().millisecondsSinceEpoch}.wav',
+      );
+      await file.writeAsBytes(_buildWavSineWave());
+      _samplePath = file.path;
+      await _player.setFilePath(file.path);
+    } catch (_) {
+      _samplePath = null;
+    } finally {
+      if (mounted) setState(() => _loadingSample = false);
+    }
+  }
+
+  Future<void> _playSample(BuildContext context) async {
+    if (_loadingSample) return;
+    try {
+      if (_player.playing) {
+        await _player.pause();
+        return;
+      }
+
+      if (_samplePath == null) {
+        await _prepareSample();
+      }
+      if (_samplePath == null) {
+        throw StateError('Sample path not available');
+      }
+      await _player.seek(Duration.zero);
+      await _player.play();
+    } catch (_) {
+      if (!context.mounted) return;
+      context.showSnack('Audio not available yet.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,11 +205,16 @@ class AhaMomentScreen extends StatelessWidget {
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 12),
-                              _AudioCard(
-                                onPressed:
-                                    () => context.showSnack(
-                                      'Sample audio will be added soon.',
-                                    ),
+                              AnimatedBuilder(
+                                animation: _waveController,
+                                builder: (context, _) {
+                                  return _AudioCard(
+                                    loading: _loadingSample,
+                                    isPlaying: _isPlaying,
+                                    animationValue: _waveController.value,
+                                    onPressed: () => _playSample(context),
+                                  );
+                                },
                               ),
                               const SizedBox(height: 12),
                               const Icon(
@@ -283,8 +389,25 @@ class _TitleMark extends StatelessWidget {
 
 class _AudioCard extends StatelessWidget {
   final VoidCallback? onPressed;
+  final bool loading;
+  final bool isPlaying;
+  final double animationValue;
 
-  const _AudioCard({required this.onPressed});
+  const _AudioCard({
+    required this.onPressed,
+    required this.loading,
+    required this.isPlaying,
+    required this.animationValue,
+  });
+
+  List<double> _animatedBars(List<double> base) {
+    final phase = animationValue * 2 * math.pi;
+    return List.generate(base.length, (i) {
+      final wobble = (math.sin(phase + (i * 0.55)) + 1) / 2;
+      final scale = 0.55 + (0.75 * wobble);
+      return (base[i] * scale).clamp(0.12, 1.0);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -314,6 +437,8 @@ class _AudioCard extends StatelessWidget {
       0.55,
       0.25,
     ];
+    final beeping = isPlaying && !loading;
+    final pulse = (math.sin(animationValue * 2 * math.pi) + 1) / 2;
 
     return Container(
       decoration: BoxDecoration(
@@ -333,16 +458,45 @@ class _AudioCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
+              SizedBox(
                 width: 42,
                 height: 42,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primaryGreen.withAlpha(18),
-                ),
-                child: const Icon(
-                  Icons.volume_up,
-                  color: AppColors.primaryGreen,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.primaryGreen.withAlpha(18),
+                      ),
+                    ),
+                    if (beeping)
+                      Transform.scale(
+                        scale: 1.0 + (0.22 * pulse),
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.primaryGreen.withAlpha(90),
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    Transform.scale(
+                      scale: beeping ? (1.0 + (0.08 * pulse)) : 1.0,
+                      child: Icon(
+                        Icons.volume_up,
+                        color: AppColors.primaryGreen.withAlpha(
+                          beeping ? (170 + (85 * pulse).round()) : 255,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 12),
@@ -362,23 +516,64 @@ class _AudioCard extends StatelessWidget {
           Row(
             children: [
               SizedBox(
-                width: 52,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: onPressed,
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: EdgeInsets.zero,
-                    backgroundColor: AppColors.primaryGreen,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Icon(Icons.play_arrow, size: 26),
+                width: 60,
+                height: 60,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (isPlaying && !loading)
+                      Transform.scale(
+                        scale:
+                            1.0 +
+                            (0.25 *
+                                ((math.sin(animationValue * 2 * math.pi) + 1) /
+                                    2)),
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.primaryGreen.withAlpha(90),
+                              width: 3,
+                            ),
+                          ),
+                        ),
+                      ),
+                    SizedBox(
+                      width: 52,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: onPressed,
+                        style: ElevatedButton.styleFrom(
+                          shape: const CircleBorder(),
+                          padding: EdgeInsets.zero,
+                          backgroundColor: AppColors.primaryGreen,
+                          foregroundColor: Colors.white,
+                        ),
+                        child:
+                            loading
+                                ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : Icon(
+                                  isPlaying ? Icons.pause : Icons.play_arrow,
+                                  size: 26,
+                                ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 14),
-              const Expanded(
+              Expanded(
                 child: AudioWaveform(
-                  bars: bars,
+                  bars: isPlaying && !loading ? _animatedBars(bars) : bars,
                   color: AppColors.primaryGreen,
                   height: 26,
                   barWidth: 4,
@@ -392,3 +587,51 @@ class _AudioCard extends StatelessWidget {
     );
   }
 }
+
+Uint8List _buildWavSineWave({
+  int sampleRate = 44100,
+  int durationMs = 900,
+  double frequencyHz = 440,
+  double amplitude = 0.25,
+}) {
+  final numSamples = (sampleRate * durationMs / 1000).round();
+  final pcm = Int16List(numSamples);
+  final twoPi = 2 * math.pi;
+
+  for (var i = 0; i < numSamples; i++) {
+    final t = i / sampleRate;
+    final v = math.sin(twoPi * frequencyHz * t) * amplitude;
+    pcm[i] = (v * 32767).clamp(-32767, 32767).round();
+  }
+
+  final pcmBytes = Uint8List.view(pcm.buffer);
+  final byteRate = sampleRate * 2;
+  final dataLength = pcmBytes.lengthInBytes;
+  final fileLength = 44 + dataLength;
+
+  final bytes = BytesBuilder();
+  bytes.add(_ascii('RIFF'));
+  bytes.add(_le32(fileLength - 8));
+  bytes.add(_ascii('WAVE'));
+  bytes.add(_ascii('fmt '));
+  bytes.add(_le32(16));
+  bytes.add(_le16(1));
+  bytes.add(_le16(1));
+  bytes.add(_le32(sampleRate));
+  bytes.add(_le32(byteRate));
+  bytes.add(_le16(2));
+  bytes.add(_le16(16));
+  bytes.add(_ascii('data'));
+  bytes.add(_le32(dataLength));
+  bytes.add(pcmBytes);
+  return bytes.toBytes();
+}
+
+Uint8List _ascii(String s) => Uint8List.fromList(s.codeUnits);
+Uint8List _le16(int v) => Uint8List.fromList([v & 0xFF, (v >> 8) & 0xFF]);
+Uint8List _le32(int v) => Uint8List.fromList([
+  v & 0xFF,
+  (v >> 8) & 0xFF,
+  (v >> 16) & 0xFF,
+  (v >> 24) & 0xFF,
+]);
