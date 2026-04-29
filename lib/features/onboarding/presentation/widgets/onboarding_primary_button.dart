@@ -24,18 +24,13 @@ class OnboardingPrimaryButton extends StatelessWidget {
           foregroundColor: Colors.white,
           shape: const StadiumBorder(),
         ),
-        child: Stack(
-          alignment: Alignment.center,
+        child: Row(
           children: [
-            Text(label),
-            const Positioned.fill(
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 14),
-                  child: Icon(Icons.arrow_forward),
-                ),
-              ),
+            const SizedBox(width: 38),
+            Expanded(child: Center(child: Text(label))),
+            const Padding(
+              padding: EdgeInsets.only(right: 14),
+              child: Icon(Icons.arrow_forward),
             ),
           ],
         ),

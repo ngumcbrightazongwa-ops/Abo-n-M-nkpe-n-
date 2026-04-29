@@ -39,7 +39,7 @@ class FeedbackScreen extends StatelessWidget {
               const Spacer(),
               PrimaryButton(
                 label: 'Continue',
-                onPressed: () => context.go('/onboarding/celebration'),
+                onPressed: () => context.push('/onboarding/celebration'),
               ),
             ],
           ),

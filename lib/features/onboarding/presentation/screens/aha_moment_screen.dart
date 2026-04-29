@@ -42,7 +42,7 @@ class AhaMomentScreen extends StatelessWidget {
               const Spacer(),
               PrimaryButton(
                 label: 'Continue',
-                onPressed: () => context.go('/onboarding/lesson'),
+                onPressed: () => context.push('/onboarding/lesson'),
               ),
             ],
           ),

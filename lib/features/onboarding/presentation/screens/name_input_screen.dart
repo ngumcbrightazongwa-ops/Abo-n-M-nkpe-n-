@@ -38,7 +38,7 @@ class _NameInputScreenState extends ConsumerState<NameInputScreen> {
     final name = _controller.text.trim();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surface,
       body: Stack(
         children: [
           const OnboardingBackground(child: SizedBox.expand()),
@@ -49,9 +49,9 @@ class _NameInputScreenState extends ConsumerState<NameInputScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.background,
-                    AppColors.background,
-                    Color(0x00F8F7F4),
+                    AppColors.surface,
+                    AppColors.surface,
+                    Color(0x00FFFFFF),
                   ],
                   stops: [0, 0.55, 1],
                 ),
@@ -208,7 +208,7 @@ class _NameInputScreenState extends ConsumerState<NameInputScreen> {
     if (name.isEmpty) return;
     await ref.read(onboardingControllerProvider.notifier).setName(name);
     if (!context.mounted) return;
-    context.go('/onboarding/goal');
+    context.push('/onboarding/goal');
   }
 }
 

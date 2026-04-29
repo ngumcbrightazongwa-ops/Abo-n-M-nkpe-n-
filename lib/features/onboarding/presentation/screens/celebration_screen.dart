@@ -35,7 +35,7 @@ class CelebrationScreen extends StatelessWidget {
                   const Spacer(),
                   PrimaryButton(
                     label: 'Continue',
-                    onPressed: () => context.go('/onboarding/streak'),
+                    onPressed: () => context.push('/onboarding/streak'),
                   ),
                 ],
               ),

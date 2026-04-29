@@ -22,11 +22,39 @@ class OnboardingOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final trailing = selected
+        ? Container(
+            width: 24,
+            height: 24,
+            decoration: const BoxDecoration(
+              color: AppColors.primaryGreen,
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.check,
+                size: 16,
+                color: Colors.white,
+              ),
+            ),
+          )
+        : Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.primaryGreen,
+                width: 2,
+              ),
+            ),
+          );
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
       decoration: BoxDecoration(
-        color: selected ? AppColors.primaryGreen.withAlpha(26) : AppColors.surface,
+        color: selected ? AppColors.primaryGreen.withAlpha(18) : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
         border: Border.all(
           color: selected ? AppColors.primaryGreen : AppColors.border,
@@ -58,11 +86,8 @@ class OnboardingOptionCard extends StatelessWidget {
               ),
               AnimatedScale(
                 duration: const Duration(milliseconds: 200),
-                scale: selected ? 1 : 0.8,
-                child: Icon(
-                  selected ? Icons.check_circle : Icons.circle_outlined,
-                  color: selected ? AppColors.primaryGreen : AppColors.border,
-                ),
+                scale: selected ? 1 : 0.9,
+                child: trailing,
               ),
             ],
           ),

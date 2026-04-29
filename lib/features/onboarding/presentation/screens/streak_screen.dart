@@ -52,7 +52,7 @@ class StreakScreen extends StatelessWidget {
               const Spacer(),
               PrimaryButton(
                 label: 'Continue',
-                onPressed: () => context.go('/onboarding/commitment'),
+                onPressed: () => context.push('/onboarding/commitment'),
               ),
             ],
           ),

@@ -3,17 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/constants/app_sizes.dart';
+import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
-import '../../../../shared/widgets/primary_button.dart';
 import '../controllers/onboarding_controller.dart';
-import '../widgets/onboarding_character.dart';
+import '../widgets/adaptive_asset_image.dart';
+import '../widgets/onboarding_background.dart';
 import '../widgets/onboarding_option_card.dart';
+import '../widgets/onboarding_primary_button.dart';
 
 class GoalSelectionScreen extends ConsumerStatefulWidget {
   const GoalSelectionScreen({super.key});
 
   @override
-  ConsumerState<GoalSelectionScreen> createState() => _GoalSelectionScreenState();
+  ConsumerState<GoalSelectionScreen> createState() =>
+      _GoalSelectionScreenState();
 }
 
 class _GoalSelectionScreenState extends ConsumerState<GoalSelectionScreen> {
@@ -29,54 +32,127 @@ class _GoalSelectionScreenState extends ConsumerState<GoalSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     final options = const [
-      ('Speak with family', 'Everyday greetings and conversations'),
-      ('Travel & culture', 'Useful phrases for visiting home'),
-      ('School & study', 'Structured learning, step by step'),
-      ('Just curious', 'A fun start with short lessons'),
+      ('Speak Nkwen confidently', Icons.chat_bubble_outline),
+      ('Understand elders easily', Icons.hearing_outlined),
+      ('Learn for family connection', Icons.groups_2_outlined),
+      ('Teach my children', Icons.menu_book_outlined),
+      ('Improve pronunciation', Icons.graphic_eq),
+      ('Just exploring', Icons.explore_outlined),
     ];
 
     return Scaffold(
-      appBar: AppBar(),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSizes.pagePadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                child: OnboardingCharacter(
-                  state: OnboardingCharacterState.happy,
-                  height: 190,
+      backgroundColor: AppColors.surface,
+      body: Stack(
+        children: [
+          const OnboardingBackground(child: SizedBox.expand()),
+          const Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppColors.surface,
+                    AppColors.surface,
+                    Color(0x00FFFFFF),
+                  ],
+                  stops: [0, 0.55, 1],
                 ),
               ),
-              const SizedBox(height: 12),
-              Text('What’s your goal?', style: AppTextStyles.headline),
-              const SizedBox(height: 6),
-              Text('Pick one to customize your path.', style: AppTextStyles.bodyMuted),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: options.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final (title, subtitle) = options[index];
-                    return OnboardingOptionCard(
-                      title: title,
-                      subtitle: subtitle,
-                      selected: _selected == title,
-                      onTap: () => setState(() => _selected = title),
-                      leading: const Icon(Icons.flag_outlined),
-                    );
-                  },
-                ),
-              ),
-              PrimaryButton(
-                label: 'Continue',
-                onPressed: _selected == null ? null : () => _continue(context),
-              ),
-            ],
+            ),
           ),
-        ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSizes.pagePadding),
+              child: Column(
+                children: [
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Material(
+                        color: AppColors.surface,
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: () {
+                            final router = GoRouter.of(context);
+                            if (router.canPop()) {
+                              router.pop();
+                              return;
+                            }
+                            context.go('/onboarding/name');
+                          },
+                          child: const SizedBox(
+                            width: 44,
+                            height: 44,
+                            child: Icon(Icons.chevron_left),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      const _StepIndicator(count: 5, index: 1),
+                      const Spacer(),
+                      const SizedBox(width: 44, height: 44),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Transform.translate(
+                    offset: const Offset(0, -14),
+                    child: SizedBox(
+                      height: (MediaQuery.sizeOf(context).height * 0.29).clamp(
+                        190.0,
+                        270.0,
+                      ),
+                      child: const AdaptiveAssetImage(
+                        basePath: 'assets/characters/goal_hero',
+                        fit: BoxFit.contain,
+                        alignment: Alignment.bottomCenter,
+                        placeholder: Center(
+                          child: AdaptiveAssetImage(
+                            basePath: 'assets/characters/name_input_hero',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const _GoalTitle(),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Tell us what you want to achieve.\nWe’ll personalize your learning.",
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.bodyMuted,
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      itemCount: options.length,
+                      separatorBuilder:
+                          (context, index) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final (title, icon) = options[index];
+                        return OnboardingOptionCard(
+                          title: title,
+                          selected: _selected == title,
+                          onTap: () => setState(() => _selected = title),
+                          leading: _GoalIcon(icon: icon),
+                        );
+                      },
+                    ),
+                  ),
+                  OnboardingPrimaryButton(
+                    label: 'Continue',
+                    onPressed:
+                        _selected == null ? null : () => _continue(context),
+                  ),
+                  const SizedBox(height: 6),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -86,7 +162,135 @@ class _GoalSelectionScreenState extends ConsumerState<GoalSelectionScreen> {
     if (goal == null) return;
     await ref.read(onboardingControllerProvider.notifier).setGoal(goal);
     if (!context.mounted) return;
-    context.go('/onboarding/problem');
+    context.push('/onboarding/problem');
   }
 }
 
+class _GoalIcon extends StatelessWidget {
+  final IconData icon;
+
+  const _GoalIcon({required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: AppColors.primaryGreen.withAlpha(18),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: AppColors.primaryGreen),
+    );
+  }
+}
+
+class _StepIndicator extends StatelessWidget {
+  final int count;
+  final int index;
+
+  const _StepIndicator({required this.count, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < count; i++) ...[
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 26,
+            height: 6,
+            decoration: BoxDecoration(
+              color: i <= index ? AppColors.primaryGreen : AppColors.border,
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+          if (i != count - 1) const SizedBox(width: 8),
+        ],
+      ],
+    );
+  }
+}
+
+class _GoalTitle extends StatelessWidget {
+  const _GoalTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
+      children: [
+        Text(
+          'What is your goal?',
+          textAlign: TextAlign.center,
+          style: AppTextStyles.headline.copyWith(
+            fontSize: 34,
+            height: 1.06,
+            color: AppColors.primaryGreen,
+          ),
+        ),
+        const Positioned(
+          left: -30,
+          child: _TitleMarks(
+            colors: [Color(0xFFF59E0B), Color(0xFFEF4444), Color(0xFF22C55E)],
+            flip: true,
+          ),
+        ),
+        const Positioned(
+          right: -30,
+          child: _TitleMarks(
+            colors: [Color(0xFFF59E0B), Color(0xFFEF4444), Color(0xFF22C55E)],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TitleMarks extends StatelessWidget {
+  final List<Color> colors;
+  final bool flip;
+
+  const _TitleMarks({required this.colors, this.flip = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final child = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _TitleMark(color: colors[0], rotation: -0.6),
+        const SizedBox(height: 8),
+        _TitleMark(color: colors[1], rotation: -0.1),
+        const SizedBox(height: 8),
+        _TitleMark(color: colors[2], rotation: 0.4),
+      ],
+    );
+
+    if (!flip) return child;
+    return Transform.flip(flipX: true, child: child);
+  }
+}
+
+class _TitleMark extends StatelessWidget {
+  final Color color;
+  final double rotation;
+
+  const _TitleMark({required this.color, required this.rotation});
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: rotation,
+      child: Container(
+        width: 20,
+        height: 5,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(999),
+        ),
+      ),
+    );
+  }
+}

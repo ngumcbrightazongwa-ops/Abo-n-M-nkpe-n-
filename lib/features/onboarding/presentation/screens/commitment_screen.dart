@@ -85,7 +85,7 @@ class _CommitmentScreenState extends ConsumerState<CommitmentScreen> {
     if (level == null) return;
     await ref.read(onboardingControllerProvider.notifier).setCommitmentLevel(level);
     if (!context.mounted) return;
-    context.go('/onboarding/summary');
+    context.push('/onboarding/summary');
   }
 }
 

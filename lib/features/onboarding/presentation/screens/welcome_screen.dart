@@ -73,7 +73,7 @@ class WelcomeScreen extends StatelessWidget {
                       const SizedBox(height: 18),
                       OnboardingPrimaryButton(
                         label: 'Get Started',
-                        onPressed: () => context.go('/onboarding/name'),
+                        onPressed: () => context.push('/onboarding/name'),
                       ),
                       const SizedBox(height: 10),
                     ],
