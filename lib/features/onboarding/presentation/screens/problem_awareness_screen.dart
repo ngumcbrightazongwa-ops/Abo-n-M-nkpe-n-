@@ -108,6 +108,7 @@ class _ProblemAwarenessScreenState extends State<ProblemAwarenessScreen> {
                         basePath: 'assets/characters/feel_hero',
                         fit: BoxFit.contain,
                         alignment: Alignment.bottomCenter,
+                        fadeBottom: true,
                         placeholder: Center(
                           child: OnboardingCharacter(
                             state: OnboardingCharacterState.thinking,
@@ -222,7 +223,8 @@ class _StepIndicator extends StatelessWidget {
                   width: 26,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: i < index ? AppColors.primaryGreen : AppColors.border,
+                    color:
+                        i < index ? AppColors.primaryGreen : AppColors.border,
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),

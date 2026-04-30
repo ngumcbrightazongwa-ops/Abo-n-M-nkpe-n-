@@ -14,6 +14,8 @@ class AdaptiveAssetImage extends StatelessWidget {
   final BoxFit fit;
   final AlignmentGeometry alignment;
   final Widget? placeholder;
+  final bool fadeBottom;
+  final double fadeStart;
 
   const AdaptiveAssetImage({
     super.key,
@@ -23,6 +25,8 @@ class AdaptiveAssetImage extends StatelessWidget {
     this.fit = BoxFit.contain,
     this.alignment = Alignment.center,
     this.placeholder,
+    this.fadeBottom = false,
+    this.fadeStart = 0.78,
   });
 
   static Future<Set<String>> _loadManifestKeys() async {
@@ -117,7 +121,7 @@ class AdaptiveAssetImage extends StatelessWidget {
                 return placeholder ?? _defaultPlaceholder();
               }
 
-              return SvgPicture.string(
+              final svg = SvgPicture.string(
                 svgSnapshot.data!,
                 width: effectiveWidth,
                 height: effectiveHeight,
@@ -140,11 +144,13 @@ class AdaptiveAssetImage extends StatelessWidget {
                   return placeholder ?? _defaultPlaceholder();
                 },
               );
+
+              return _applyBottomFade(svg);
             },
           );
         }
 
-        return Image.asset(
+        final img = Image.asset(
           path,
           width: effectiveWidth,
           height: effectiveHeight,
@@ -154,7 +160,32 @@ class AdaptiveAssetImage extends StatelessWidget {
               (context, error, stackTrace) =>
                   placeholder ?? _defaultPlaceholder(),
         );
+        return _applyBottomFade(img);
       },
+    );
+  }
+
+  Widget _applyBottomFade(Widget child) {
+    if (!fadeBottom) return child;
+
+    final start = fadeStart.clamp(0.0, 1.0).toDouble();
+    final middle = start == 1.0 ? 0.999 : start;
+
+    return ShaderMask(
+      blendMode: BlendMode.dstIn,
+      shaderCallback: (bounds) {
+        return LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: const [
+            Color(0xFFFFFFFF),
+            Color(0xFFFFFFFF),
+            Color(0x00FFFFFF),
+          ],
+          stops: [0, middle, 1],
+        ).createShader(bounds);
+      },
+      child: child,
     );
   }
 

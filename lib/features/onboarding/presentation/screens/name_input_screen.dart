@@ -125,11 +125,13 @@ class _NameInputScreenState extends ConsumerState<NameInputScreen> {
                                         'assets/characters/name_input_hero',
                                     fit: BoxFit.cover,
                                     alignment: Alignment.topCenter,
+                                    fadeBottom: true,
                                     placeholder: AdaptiveAssetImage(
                                       basePath:
                                           'assets/characters/welcome_family',
                                       fit: BoxFit.cover,
                                       alignment: Alignment.topCenter,
+                                      fadeBottom: true,
                                     ),
                                   ),
                                 ),

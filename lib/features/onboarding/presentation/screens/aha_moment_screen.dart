@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math' as math;
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -25,10 +23,13 @@ class AhaMomentScreen extends StatefulWidget {
 
 class _AhaMomentScreenState extends State<AhaMomentScreen>
     with SingleTickerProviderStateMixin {
+  static const String _ahaSampleAsset =
+      'assets/audio/onboarding/aha_phrase.m4a';
+
   late final AudioPlayer _player;
   late final AnimationController _waveController;
   late final StreamSubscription<PlayerState> _playerSub;
-  String? _samplePath;
+  bool _sampleReady = false;
   bool _loadingSample = false;
   bool _isPlaying = false;
 
@@ -79,14 +80,10 @@ class _AhaMomentScreenState extends State<AhaMomentScreen>
     if (_loadingSample) return;
     setState(() => _loadingSample = true);
     try {
-      final file = File(
-        '${Directory.systemTemp.path}${Platform.pathSeparator}nkwen_sample_${DateTime.now().millisecondsSinceEpoch}.wav',
-      );
-      await file.writeAsBytes(_buildWavSineWave());
-      _samplePath = file.path;
-      await _player.setFilePath(file.path);
+      await _player.setAsset(_ahaSampleAsset);
+      _sampleReady = true;
     } catch (_) {
-      _samplePath = null;
+      _sampleReady = false;
     } finally {
       if (mounted) setState(() => _loadingSample = false);
     }
@@ -100,11 +97,11 @@ class _AhaMomentScreenState extends State<AhaMomentScreen>
         return;
       }
 
-      if (_samplePath == null) {
+      if (!_sampleReady) {
         await _prepareSample();
       }
-      if (_samplePath == null) {
-        throw StateError('Sample path not available');
+      if (!_sampleReady) {
+        throw StateError('Sample asset not available');
       }
       await _player.seek(Duration.zero);
       await _player.play();
@@ -178,9 +175,9 @@ class _AhaMomentScreenState extends State<AhaMomentScreen>
                           child: Column(
                             children: [
                               SizedBox(
-                                height: (constraints.maxHeight * 0.34).clamp(
-                                  160.0,
-                                  250.0,
+                                height: (constraints.maxHeight * 0.30).clamp(
+                                  140.0,
+                                  220.0,
                                 ),
                                 child: ClipRect(
                                   child: Transform.translate(
@@ -190,6 +187,7 @@ class _AhaMomentScreenState extends State<AhaMomentScreen>
                                           'assets/characters/child_thinking',
                                       fit: BoxFit.contain,
                                       alignment: Alignment.bottomCenter,
+                                      fadeBottom: true,
                                     ),
                                   ),
                                 ),
@@ -587,51 +585,3 @@ class _AudioCard extends StatelessWidget {
     );
   }
 }
-
-Uint8List _buildWavSineWave({
-  int sampleRate = 44100,
-  int durationMs = 900,
-  double frequencyHz = 440,
-  double amplitude = 0.25,
-}) {
-  final numSamples = (sampleRate * durationMs / 1000).round();
-  final pcm = Int16List(numSamples);
-  final twoPi = 2 * math.pi;
-
-  for (var i = 0; i < numSamples; i++) {
-    final t = i / sampleRate;
-    final v = math.sin(twoPi * frequencyHz * t) * amplitude;
-    pcm[i] = (v * 32767).clamp(-32767, 32767).round();
-  }
-
-  final pcmBytes = Uint8List.view(pcm.buffer);
-  final byteRate = sampleRate * 2;
-  final dataLength = pcmBytes.lengthInBytes;
-  final fileLength = 44 + dataLength;
-
-  final bytes = BytesBuilder();
-  bytes.add(_ascii('RIFF'));
-  bytes.add(_le32(fileLength - 8));
-  bytes.add(_ascii('WAVE'));
-  bytes.add(_ascii('fmt '));
-  bytes.add(_le32(16));
-  bytes.add(_le16(1));
-  bytes.add(_le16(1));
-  bytes.add(_le32(sampleRate));
-  bytes.add(_le32(byteRate));
-  bytes.add(_le16(2));
-  bytes.add(_le16(16));
-  bytes.add(_ascii('data'));
-  bytes.add(_le32(dataLength));
-  bytes.add(pcmBytes);
-  return bytes.toBytes();
-}
-
-Uint8List _ascii(String s) => Uint8List.fromList(s.codeUnits);
-Uint8List _le16(int v) => Uint8List.fromList([v & 0xFF, (v >> 8) & 0xFF]);
-Uint8List _le32(int v) => Uint8List.fromList([
-  v & 0xFF,
-  (v >> 8) & 0xFF,
-  (v >> 16) & 0xFF,
-  (v >> 24) & 0xFF,
-]);

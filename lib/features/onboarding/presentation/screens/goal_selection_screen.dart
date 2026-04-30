@@ -107,10 +107,12 @@ class _GoalSelectionScreenState extends ConsumerState<GoalSelectionScreen> {
                         basePath: 'assets/characters/goal_hero',
                         fit: BoxFit.contain,
                         alignment: Alignment.bottomCenter,
+                        fadeBottom: true,
                         placeholder: Center(
                           child: AdaptiveAssetImage(
                             basePath: 'assets/characters/name_input_hero',
                             fit: BoxFit.contain,
+                            fadeBottom: true,
                           ),
                         ),
                       ),

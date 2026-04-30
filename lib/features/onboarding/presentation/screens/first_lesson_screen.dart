@@ -31,7 +31,11 @@ class _FirstLessonScreenState extends State<FirstLessonScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [AppColors.surface, AppColors.surface, Color(0x00FFFFFF)],
+                  colors: [
+                    AppColors.surface,
+                    AppColors.surface,
+                    Color(0x00FFFFFF),
+                  ],
                   stops: [0, 0.6, 1],
                 ),
               ),
@@ -66,11 +70,14 @@ class _FirstLessonScreenState extends State<FirstLessonScreen> {
                         ),
                       ),
                       const Spacer(),
-                      const _StepIndicator(count: 7, index: 5),
+                      const _StepIndicator(count: 5, index: 4),
                       const Spacer(),
                       _LessonBadge(
                         label: 'Lesson 1',
-                        onTap: () => context.showSnack('Lesson details coming soon.'),
+                        onTap:
+                            () => context.showSnack(
+                              'Lesson details coming soon.',
+                            ),
                       ),
                     ],
                   ),
@@ -84,66 +91,83 @@ class _FirstLessonScreenState extends State<FirstLessonScreen> {
                   ),
                   const SizedBox(height: 14),
                   Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Transform.translate(
-                          offset: const Offset(0, -6),
-                          child: SizedBox(
-                            height: (MediaQuery.sizeOf(context).height * 0.32).clamp(
-                              220.0,
-                              330.0,
-                            ),
-                            child: const AdaptiveAssetImage(
-                              basePath: 'assets/characters/first_lesson_hero',
-                              fit: BoxFit.contain,
-                              alignment: Alignment.bottomCenter,
-                              placeholder: OnboardingCharacter(
-                                state: OnboardingCharacterState.happy,
-                                height: 260,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final heroHeight = (constraints.maxHeight * 0.34).clamp(
+                          160.0,
+                          280.0,
+                        );
+
+                        return SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Transform.translate(
+                                offset: const Offset(0, -6),
+                                child: SizedBox(
+                                  height: heroHeight,
+                                  child: const AdaptiveAssetImage(
+                                    basePath:
+                                        'assets/characters/first_lesson_hero',
+                                    fit: BoxFit.contain,
+                                    alignment: Alignment.bottomCenter,
+                                    fadeBottom: true,
+                                    placeholder: OnboardingCharacter(
+                                      state: OnboardingCharacterState.happy,
+                                      height: 260,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 10),
+                              const _WordCard(
+                                label: "Today's word",
+                                word: 'Mba',
+                                meaning: 'hello',
+                                hint: 'Listen and say it',
+                              ),
+                              const SizedBox(height: 18),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _RoundAction(
+                                      icon: Icons.volume_up,
+                                      label: 'Play Audio',
+                                      onTap:
+                                          () => context.showSnack(
+                                            'Pronunciation audio will be added soon.',
+                                          ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: _RoundAction(
+                                      icon: Icons.mic,
+                                      label: 'Tap to Speak',
+                                      onTap:
+                                          () => context.push(
+                                            '/onboarding/feedback/correct',
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 18),
+                              const _TipCard(
+                                title: 'Tip: Speak clearly and confidently.',
+                                subtitle: "You’re doing great!",
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        const _WordCard(
-                          label: "Today's word",
-                          word: 'Mba',
-                          meaning: 'hello',
-                          hint: 'Listen and say it',
-                        ),
-                        const SizedBox(height: 18),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _RoundAction(
-                                icon: Icons.volume_up,
-                                label: 'Play Audio',
-                                onTap: () => context.showSnack('Pronunciation audio will be added soon.'),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _RoundAction(
-                                icon: Icons.mic,
-                                label: 'Tap to Speak',
-                                onTap: () => context.push('/onboarding/feedback/correct'),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 18),
-                        const _TipCard(
-                          title: 'Tip: Speak clearly and confidently.',
-                          subtitle: "You’re doing great!",
-                        ),
-                      ],
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(height: 8),
                   OnboardingPrimaryButton(
                     label: 'Continue',
-                    onPressed: () => context.push('/onboarding/feedback/correct'),
+                    onPressed:
+                        () => context.push('/onboarding/feedback/correct'),
                   ),
                   const SizedBox(height: 6),
                 ],
@@ -199,6 +223,7 @@ class _StepIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         for (var i = 0; i < count; i++) ...[
           if (i == index)
@@ -221,12 +246,19 @@ class _StepIndicator extends StatelessWidget {
               ),
             )
           else
-            Container(
-              width: 26,
-              height: 6,
-              decoration: BoxDecoration(
-                color: i < index ? AppColors.primaryGreen : AppColors.border,
-                borderRadius: BorderRadius.circular(999),
+            SizedBox(
+              height: 24,
+              child: Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: 26,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color:
+                        i < index ? AppColors.primaryGreen : AppColors.border,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
               ),
             ),
           if (i != count - 1) const SizedBox(width: 8),
@@ -276,7 +308,7 @@ class _WordCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
@@ -294,7 +326,11 @@ class _WordCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.menu_book_outlined, color: AppColors.primaryGreen, size: 18),
+              const Icon(
+                Icons.menu_book_outlined,
+                color: AppColors.primaryGreen,
+                size: 18,
+              ),
               const SizedBox(width: 8),
               Text(
                 label,
@@ -309,7 +345,7 @@ class _WordCard extends StatelessWidget {
           Text(
             word,
             style: AppTextStyles.headline.copyWith(
-              fontSize: 72,
+              fontSize: 56,
               height: 1.0,
               color: const Color(0xFF0B2F14),
             ),
@@ -320,7 +356,12 @@ class _WordCard extends StatelessWidget {
             children: [
               Container(width: 44, height: 1, color: AppColors.border),
               const SizedBox(width: 10),
-              Text(meaning, style: AppTextStyles.title.copyWith(color: AppColors.textSecondary)),
+              Text(
+                meaning,
+                style: AppTextStyles.title.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
               const SizedBox(width: 10),
               Container(width: 44, height: 1, color: AppColors.border),
             ],
@@ -330,13 +371,17 @@ class _WordCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 26,
-                height: 26,
+                width: 22,
+                height: 22,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.primaryGreen.withAlpha(18),
                 ),
-                child: const Icon(Icons.sentiment_satisfied_alt, color: AppColors.primaryGreen, size: 16),
+                child: const Icon(
+                  Icons.sentiment_satisfied_alt,
+                  color: AppColors.primaryGreen,
+                  size: 14,
+                ),
               ),
               const SizedBox(width: 10),
               Text(
@@ -371,17 +416,17 @@ class _RoundAction extends StatelessWidget {
       borderRadius: BorderRadius.circular(18),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 6),
         child: Column(
           children: [
             Container(
-              width: 86,
-              height: 86,
+              width: 72,
+              height: 72,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColors.primaryGreen.withAlpha(18),
               ),
-              child: Icon(icon, color: AppColors.primaryGreen, size: 38),
+              child: Icon(icon, color: AppColors.primaryGreen, size: 32),
             ),
             const SizedBox(height: 10),
             Text(
@@ -423,7 +468,10 @@ class _TipCard extends StatelessWidget {
               color: Color(0xFFFFE0A3),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.lightbulb_outline, color: Color(0xFFB45309)),
+            child: const Icon(
+              Icons.lightbulb_outline,
+              color: Color(0xFFB45309),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -432,7 +480,9 @@ class _TipCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w800),
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(subtitle, style: AppTextStyles.bodyMuted),

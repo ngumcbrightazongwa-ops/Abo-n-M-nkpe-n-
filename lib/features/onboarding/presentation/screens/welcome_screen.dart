@@ -124,6 +124,7 @@ class _WelcomeHeader extends StatelessWidget {
                       basePath: 'assets/characters/welcome_family',
                       fit: BoxFit.cover,
                       alignment: Alignment.topCenter,
+                      fadeBottom: true,
                     ),
                   ),
                 ),
